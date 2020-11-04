@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block javascript %}
+     <script>
+
+    // $("#id_username").change(function () {
+    //      // var username = $(this).val();
+    //      var form = $(this).closest("form")
+    //      $.ajax({
+    //          url: form.attr("data_validate_username_url"),
+    //          data: form.serialize(),
+    //          dataType : 'json',
+
+    //         success: function (data){
+    //       if(data.is_taken){
+    //         alert(data.error_message)
+    //       }
+    //     }
+    //      });
+
+
+    // });
+
+    $("#btnSubmit").click(function(event){
+      event.preventDefault();
+      var form = $(this).closest("form")
+      // console.log("vou imprimir o form " + form)
+      //var username = $(this).val();
+        // var username if on top it was $("#id_username").change(function(){})
+        // but we want the whole form !
+      $.ajax({
+          type: "POST",
+          url: form.attr("data_validate_url"),
+          //data: {'username': username}
+          data: form.serialize(),
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+          dataType: 'json',
+          success: function(data){
+            if(data.is_taken){
+              alert(data.error_message)
+            }
+            if(data.username){
+              $('#output').html("bem vindo " + data.username)
+
+            }
+          }
+      });
+    });
+
+
+
+  </script>
+
+{% endblock %}
+{% block content %}
+  <form method="post" data_validate_url="{% url 'ajax:validate' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button id="btnSubmit"type="submit">Sign up</button>
+  </form>
+
+  <div id="output">
+
+  </div>
+{% endblock %}
